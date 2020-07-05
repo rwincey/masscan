@@ -1,9 +1,9 @@
 /*
-    safe "string" functions, like Microsoft's
+	safe "string" functions, like Microsoft's
 
-    This is for the "safe" clib functions, where things like "strcpy()" is
-    replaced with a safer version of the function, like "strcpy_s()". Since
-    these things are non-standard, compilers deal with them differently.
+	This is for the "safe" clib functions, where things like "strcpy()" is
+	replaced with a safer version of the function, like "strcpy_s()". Since
+	these things are non-standard, compilers deal with them differently.
 
  Reference:
  http://msdn.microsoft.com/en-us/library/bb288454.aspx
@@ -55,8 +55,44 @@
 
 const char *strerror_x(int x);
 
-#if defined(_MSC_VER) && (_MSC_VER == 1900)
+#if defined(_MSC_VER) && (_MSC_VER >= 1910) && (_MSC_VER <= 1916)
+/*Visual Studio 2017 (v15.0-15.8)*/
+# include <stdio.h>
+# include <string.h>
+# define strcasecmp     _stricmp
+# define memcasecmp     _memicmp
+# ifndef PRIu64
+#  define PRIu64 "llu"
+#  define PRId64 "lld"
+#  define PRIx64 "llx"
+# endif
+
+#elif defined(_MSC_VER) && (_MSC_VER == 1900)
 /*Visual Studio 2015*/
+# include <stdio.h>
+# include <string.h>
+# define strcasecmp     _stricmp
+# define memcasecmp     _memicmp
+# ifndef PRIu64
+#  define PRIu64 "llu"
+#  define PRId64 "lld"
+#  define PRIx64 "llx"
+# endif
+
+#elif defined(_MSC_VER) && (_MSC_VER == 1800)
+/*Visual Studio 2013*/
+# include <stdio.h>
+# include <string.h>
+# define strcasecmp     _stricmp
+# define memcasecmp     _memicmp
+# ifndef PRIu64
+#  define PRIu64 "llu"
+#  define PRId64 "lld"
+#  define PRIx64 "llx"
+# endif
+
+#elif defined(_MSC_VER) && (_MSC_VER == 1700)
+/*Visual Studio 2012*/
 # include <stdio.h>
 # include <string.h>
 # define strcasecmp     _stricmp
@@ -79,14 +115,13 @@ const char *strerror_x(int x);
 #  define PRIx64 "llx"
 # endif
 
-
 #elif defined(_MSC_VER) && (_MSC_VER == 1200)
 /* Visual Studio 6.0 */
 # define sprintf_s      _snprintf
 # define strcasecmp     _stricmp
 # define memcasecmp     _memicmp
 # define vsprintf_s     _vsnprintf
- typedef int errno_t;
+typedef int errno_t;
 errno_t fopen_s(FILE **fp, const char *filename, const char *mode);
 
 #elif defined(__GNUC__) && (__GNUC__ >= 4)
@@ -94,18 +129,16 @@ errno_t fopen_s(FILE **fp, const char *filename, const char *mode);
 /* GCC 4 */
 # define sprintf_s      snprintf
 # define vsprintf_s     vsnprintf
- int memcasecmp(const void *lhs, const void *rhs, int length);
- typedef int errno_t;
-#if !defined(WIN32) /* mingw */
+int memcasecmp(const void *lhs, const void *rhs, int length);
+typedef int errno_t;
 errno_t fopen_s(FILE **fp, const char *filename, const char *mode);
 errno_t strcpy_s(char *dst, size_t sizeof_dst, const char *src);
 errno_t localtime_s(struct tm* _tm, const time_t *time);
 errno_t gmtime_s(struct tm* _tm, const time_t *time);
-#endif
 #undef strerror
 
 #else
-# warning unknown compiler
+# error unknown compiler
 #endif
 
 

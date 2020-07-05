@@ -1,3 +1,6 @@
 paused.conf
 .Makefile.swp
 .vscode
+*.opendb
+*.db
+vs10/.vs/masscan/v15/.suo
